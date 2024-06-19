@@ -94,7 +94,7 @@ class _CustomCrosshairState extends State<CustomCrosshair> {
 class ChartData {
   ChartData(this.x, this.y);
 
-  final dynamic x;
+  final DateTime x;
   final double y;
 }
 
