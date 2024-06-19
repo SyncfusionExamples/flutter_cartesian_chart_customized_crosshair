@@ -6,7 +6,7 @@ import 'package:syncfusion_flutter_core/core.dart';
 import 'package:intl/intl.dart' hide TextDirection;
 import 'package:syncfusion_flutter_core/theme.dart';
 
-dynamic verticalValue;
+String verticalText = '';
 String horizontalText = '';
 
 void main() {
@@ -39,8 +39,7 @@ class _CustomCrosshairState extends State<CustomCrosshair> {
   @override
   void initState() {
     chartData = [
-      ChartData(DateTime(2024, 2, 0), 31),
-      ChartData(DateTime(2024, 2, 1), 21),
+      ChartData(DateTime(2024, 2, 1), 1),
       ChartData(DateTime(2024, 2, 2), 19),
       ChartData(DateTime(2024, 2, 3), 11),
       ChartData(DateTime(2024, 2, 4), 41),
@@ -69,15 +68,15 @@ class _CustomCrosshairState extends State<CustomCrosshair> {
               horizontalText = args.text;
             }
             if (args.orientation == AxisOrientation.vertical) {
-              verticalValue = args.value;
+              verticalText = args.text;
             }
           }
         },
+        crosshairBehavior: _CustomCrosshairBehavior(),
         primaryXAxis: DateTimeAxis(
           dateFormat: DateFormat.MEd(),
           edgeLabelPlacement: EdgeLabelPlacement.shift,
         ),
-        crosshairBehavior: _CustomCrosshairBehavior(),
         series: <CartesianSeries<ChartData, DateTime>>[
           SplineSeries(
             dataSource: chartData,
@@ -157,7 +156,7 @@ class _CustomCrosshairBehavior extends CrosshairBehavior {
   @override
   void onPaint(PaintingContext context, Offset offset,
       SfChartThemeData chartThemeData, ThemeData themeData) {
-    if (position != null && horizontalText != '' && verticalValue != null) {
+    if (position != null && horizontalText != '' && verticalText != '') {
       // Draws crosshair lines.
       super.onPaint(context, offset, chartThemeData, themeData);
       // Draw customized tooltip.
@@ -170,15 +169,13 @@ class _CustomCrosshairBehavior extends CrosshairBehavior {
             ..strokeJoin = StrokeJoin.round
             ..style = dart_ui.PaintingStyle.stroke);
 
-      final String finalText =
-          'X : ${horizontalText}  Y : ${verticalValue.toStringAsFixed(2)}';
-      final Size labelSize = measureText(finalText, textStyle);
-      _drawText(
-          context.canvas, finalText, _customPosition(labelSize), textStyle);
+      final String label = 'X : $horizontalText  Y : $verticalText';
+      final Size labelSize = measureText(label, textStyle);
+      _drawText(context.canvas, label, _withInBounds(labelSize), textStyle);
     }
   }
 
-  Offset _customPosition(Size labelSize) {
+  Offset _withInBounds(Size labelSize) {
     Offset tooltipPosition = position!.translate(20, 20);
     double xPos = tooltipPosition.dx;
     double yPos = tooltipPosition.dy;
@@ -211,7 +208,7 @@ class _CustomCrosshairBehavior extends CrosshairBehavior {
   void hide() {
     position = null;
     horizontalText = '';
-    verticalValue = null;
+    verticalText = '';
     super.hide();
   }
 }
